@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
+import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
 import Stats from 'three/examples/jsm/libs/stats.module'
 
 const scene = new THREE.Scene()
@@ -25,44 +26,61 @@ document.body.appendChild(renderer.domElement)
 const controls = new OrbitControls(camera, renderer.domElement)
 controls.enableDamping = true
 
-const material = new THREE.MeshNormalMaterial()
-
-const objLoader = new OBJLoader()
-objLoader.load(
-    'models/cube.obj',
-    (object) => {
-        object.position.x = -2
-        // (object.children[0] as THREE.Mesh).material = material
-        // object.traverse(function (child) {
-        //     if ((child as THREE.Mesh).isMesh) {
-        //         (child as THREE.Mesh).material = material
-        //     }
-        // })
-        scene.add(object)
+const mtlLoader = new MTLLoader()
+mtlLoader.load(
+    'models/monkey.mtl',
+    (materials) => {
+        materials.preload()
+        console.log(materials)
+        const objLoader = new OBJLoader()
+        objLoader.setMaterials(materials)
+        objLoader.load(
+            'models/monkey.obj',
+            (object) => {
+                scene.add(object)
+            },
+            (xhr) => {
+                console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+            },
+            (error) => {
+                console.log('An error happened')
+            }
+        )
     },
     (xhr) => {
         console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
     },
     (error) => {
-        console.log(error)
+        console.log('An error happened')
     }
 )
-objLoader.load(
-    'models/monkey2.obj',
-    (object) => {
-        (object.children[0] as THREE.Mesh).material = material
-        object.traverse(function (child) {
-            if ((child as THREE.Mesh).isMesh) {
-                (child as THREE.Mesh).material = material
+
+mtlLoader.load(
+    'models/monkeyTextured.mtl',
+    (materials) => {
+        materials.preload()
+        console.log(materials)
+        const objLoader = new OBJLoader()
+        objLoader.setMaterials(materials)
+        objLoader.load(
+            'models/monkeyTextured.obj',
+            (object) => {
+                object.position.x = 2.5
+                scene.add(object)
+            },
+            (xhr) => {
+                console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+            },
+            (error) => {
+                console.log('An error happened')
             }
-        })
-        scene.add(object)
+        )
     },
     (xhr) => {
         console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
     },
     (error) => {
-        console.log(error)
+        console.log('An error happened')
     }
 )
 
